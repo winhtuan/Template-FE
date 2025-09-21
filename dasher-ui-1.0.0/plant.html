@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plant Manager</title>
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f5f7fa;
+      }
+      .table-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin: 20px;
+      }
+      .table th,
+      .table td {
+        vertical-align: middle;
+      }
+      .breadcrumb {
+        font-size: 0.875rem;
+        color: #6c757d;
+      }
+      .badge {
+        padding: 0.5em 1em;
+      }
+      .table {
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+      }
+      .table tbody tr {
+        background-color: #f8f9fc;
+        border-radius: 0.25rem;
+      }
+      .table thead th {
+        border: none;
+        color: #6c757d;
+        font-weight: normal;
+      }
+      .table td {
+        border: none;
+      }
+      .form-select,
+      .btn-outline-secondary {
+        background-color: #f8f9fc;
+        border-color: #ced4da;
+      }
+      img {
+        width: 40px;
+        height: 40px;
+      }
+      .filter-btn {
+        border-radius: 50rem;
+        padding: 0.375rem 0.75rem;
+        margin-right: 0.5rem;
+        white-space: nowrap;
+        background-color: white;
+        border: 1px solid #ced4da;
+        color: #212529;
+      }
+      .filter-btn:hover {
+        background-color: #f8f9fa;
+      }
+      .filter-btn i {
+        margin-right: 0.25rem;
+      }
+      .filter-select {
+        border-radius: 50rem;
+        background-color: white;
+        border: 1px solid #ced4da;
+        padding: 0.375rem 2rem 0.375rem 0.75rem;
+        appearance: none;
+        position: relative;
+        color: #212529;
+      }
+      .filter-select::after {
+        content: "▼";
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+      }
+      .offcanvas-body h6 {
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      .offcanvas-body .form-check-label {
+        color: #212529;
+      }
+      .show-more {
+        color: #6f42c1;
+        cursor: pointer;
+      }
+      /* Nút dropdown chính */
+      .btn-filter {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 8px 14px;
+        font-weight: 300;
+        color: #111827;
+      }
+      .btn-filter:focus {
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        border-color: #93c5fd;
+      }
+
+      /* Menu dropdown */
+      .filter-menu {
+        border: none;
+        border-radius: 16px;
+        padding: 8px;
+        min-width: 180px;
+        background: #fff;
+        box-shadow: 0 24px 48px rgba(2, 6, 23, 0.12),
+          0 8px 16px rgba(2, 6, 23, 0.08);
+      }
+
+      /* Các item trong dropdown */
+      .dropdown-item {
+        border-radius: 10px;
+        padding: 10px 12px;
+        color: #374151;
+      }
+      .dropdown-item:hover {
+        background: #f3f4f6;
+        color: #111827;
+      }
+      .dropdown-item.active {
+        background: #eef2ff;
+        font-weight: 600;
+        color: #111827;
+      }
+
+      /* caret (mũi tên) */
+      .btn-filter.dropdown-toggle::after {
+        margin-left: 0.4rem;
+        border-top-color: #6b7280;
+      }
+
+      /* Container */
+      .search-box {
+        position: relative;
+        max-width: 400px;
+        width: 100%;
+      }
+
+      /* Icon */
+      .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        color: #9ca3af; /* xám nhạt */
+        font-size: 16px;
+        pointer-events: none;
+      }
+
+      /* Input */
+      .search-input {
+        padding: 10px 12px 10px 38px; /* chừa chỗ icon */
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background-color: #fff;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        color: #111827;
+      }
+
+      .search-input::placeholder {
+        color: #9ca3af;
+        font-size: 14px;
+      }
+
+      /* Hiệu ứng focus */
+      .search-input:focus {
+        border-color: none;
+        box-shadow: 0 0 0 2px rgba(57, 59, 61, 0.2) !important;
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="">Quản Lý Cây Trồng</h2>
+          <div class="d-flex align-items-center">
+            <div class="dropdown filter-dropdown me-3">
+                <button
+                  class="btn btn-filter dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  Xuất File
+                </button>
+                <ul class="dropdown-menu filter-menu">
+                  <li><button class="dropdown-item">Excel</button></li>
+                  <li><button class="dropdown-item">Pdf</button></li>
+                </ul>
+              </div>
+            <button class="btn btn-dark">+ Thêm cây mới</button>
+          </div>
+          
+        </div>
+
+        <div
+          class="filter-container mb-3 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center"
+        >
+          <div class="search-box mb-3">
+            <span class="search-icon">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              id="searchInput"
+              class="form-control search-input"
+              placeholder="Search plants by name, description..."
+            />
+          </div>
+
+          <div class="d-flex align-items-center flex-wrap mb-3">
+            <div class="d-flex mt-2 mt-md-0">
+              <!-- Plant Type -->
+              <div class="dropdown filter-dropdown me-2">
+                <button
+                  class="btn btn-filter dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  Plant Type
+                </button>
+                <ul class="dropdown-menu filter-menu">
+                  <li><button class="dropdown-item">Shrub</button></li>
+                  <li><button class="dropdown-item">Herb</button></li>
+                  <li><button class="dropdown-item">Tree</button></li>
+                  <li><button class="dropdown-item">Succulent</button></li>
+                </ul>
+              </div>
+
+              <!-- Regions -->
+              <div class="dropdown filter-dropdown me-2">
+                <button
+                  class="btn btn-filter dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  Regions
+                </button>
+                <ul class="dropdown-menu filter-menu">
+                  <li><button class="dropdown-item">Asia</button></li>
+                  <li><button class="dropdown-item">Europe</button></li>
+                  <li><button class="dropdown-item">America</button></li>
+                </ul>
+              </div>
+
+              <!-- Usages -->
+              <div class="dropdown filter-dropdown me-2">
+                <button
+                  class="btn btn-filter dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  Usages
+                </button>
+                <ul class="dropdown-menu filter-menu">
+                  <li><button class="dropdown-item">Ornamental</button></li>
+                  <li><button class="dropdown-item">Medicinal</button></li>
+                  <li><button class="dropdown-item">Edible</button></li>
+                </ul>
+              </div>
+
+              <!-- Soil Types -->
+              <div class="dropdown filter-dropdown me-2">
+                <button
+                  class="btn btn-filter dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  Soil Types
+                </button>
+                <ul class="dropdown-menu filter-menu">
+                  <li><button class="dropdown-item">Loam</button></li>
+                  <li><button class="dropdown-item">Clay</button></li>
+                  <li><button class="dropdown-item">Sand</button></li>
+                </ul>
+              </div>
+
+              <!-- Climates -->
+              <div class="dropdown filter-dropdown me-2">
+                <button
+                  class="btn btn-filter dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  Climates
+                </button>
+                <ul class="dropdown-menu filter-menu">
+                  <li><button class="dropdown-item">Temperate</button></li>
+                  <li><button class="dropdown-item">Mediterranean</button></li>
+                  <li><button class="dropdown-item">Arid</button></li>
+                </ul>
+              </div>
+
+              <button
+                class="btn filter-btn"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#filterOffcanvas"
+              >
+                <i class="bi bi-funnel"></i> All Filters
+              </button>
+            </div>
+          </div>
+        </div>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th><input type="checkbox" class="form-check-input" /></th>
+              <th>Plant</th>
+              <th>Family</th>
+              <th>Added Date</th>
+              <th>Plant Type</th>
+              <th>Climate</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="plantTable">
+            <!-- Data will be populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Offcanvas for More Filters -->
+    <div
+      class="offcanvas offcanvas-start"
+      tabindex="-1"
+      id="filterOffcanvas"
+      aria-labelledby="filterOffcanvasLabel"
+    >
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="filterOffcanvasLabel">Filters</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="mb-4">
+          <h6>Class</h6>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="classFilter"
+              id="class1"
+              value="Magnoliopsida"
+            />
+            <label class="form-check-label" for="class1"
+              >Magnoliopsida (1,234)</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="classFilter"
+              id="class2"
+              value="Liliopsida"
+            />
+            <label class="form-check-label" for="class2"
+              >Liliopsida (567)</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="classFilter"
+              id="class3"
+              value="Pinopsida"
+            />
+            <label class="form-check-label" for="class3">Pinopsida (890)</label>
+          </div>
+          <a class="show-more d-block mt-2">Show more ▼</a>
+        </div>
+        <div class="mb-4">
+          <h6>Family</h6>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Rosaceae"
+              id="family1"
+            />
+            <label class="form-check-label" for="family1"
+              >Rosaceae (3,296)</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Asteraceae"
+              id="family2"
+            />
+            <label class="form-check-label" for="family2"
+              >Asteraceae (638)</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Moraceae"
+              id="family3"
+            />
+            <label class="form-check-label" for="family3">Moraceae (817)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Lamiaceae"
+              id="family4"
+            />
+            <label class="form-check-label" for="family4"
+              >Lamiaceae (429)</label
+            >
+          </div>
+          <a class="show-more d-block mt-2">Show more ▼</a>
+        </div>
+        <div class="mb-4">
+          <h6>Order</h6>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Rosales"
+              id="order1"
+            />
+            <label class="form-check-label" for="order1">Rosales (1,229)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Asterales"
+              id="order2"
+            />
+            <label class="form-check-label" for="order2">Asterales (136)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Urticales"
+              id="order3"
+            />
+            <label class="form-check-label" for="order3">Urticales (360)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Lamiales"
+              id="order4"
+            />
+            <label class="form-check-label" for="order4">Lamiales (56)</label>
+          </div>
+          <a class="show-more d-block mt-2">Show more ▼</a>
+        </div>
+        <div class="mb-4">
+          <h6>Plant Type</h6>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Shrub"
+              id="type1"
+            />
+            <label class="form-check-label" for="type1">Shrub (1,229)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Herb"
+              id="type2"
+            />
+            <label class="form-check-label" for="type2">Herb (136)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Tree"
+              id="type3"
+            />
+            <label class="form-check-label" for="type3">Tree (360)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Succulent"
+              id="type4"
+            />
+            <label class="form-check-label" for="type4">Succulent (56)</label>
+          </div>
+          <a class="show-more d-block mt-2">Show more ▼</a>
+        </div>
+        <div class="mb-4">
+          <h6>Climates</h6>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Temperate"
+              id="climate1"
+            />
+            <label class="form-check-label" for="climate1"
+              >Temperate (3,296)</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Mediterranean"
+              id="climate2"
+            />
+            <label class="form-check-label" for="climate2"
+              >Mediterranean (638)</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Arid"
+              id="climate3"
+            />
+            <label class="form-check-label" for="climate3">Arid (817)</label>
+          </div>
+          <a class="show-more d-block mt-2">Show more ▼</a>
+        </div>
+        <div class="mb-4">
+          <h6>Regions</h6>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Asia"
+              id="region1"
+            />
+            <label class="form-check-label" for="region1">Asia (3,296)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Europe"
+              id="region2"
+            />
+            <label class="form-check-label" for="region2">Europe (638)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="America"
+              id="region3"
+            />
+            <label class="form-check-label" for="region3">America (817)</label>
+          </div>
+          <a class="show-more d-block mt-2">Show more ▼</a>
+        </div>
+        <div class="mb-4">
+          <h6>Soil Types</h6>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Loam"
+              id="soil1"
+            />
+            <label class="form-check-label" for="soil1">Loam (3,296)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Clay"
+              id="soil2"
+            />
+            <label class="form-check-label" for="soil2">Clay (638)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Sand"
+              id="soil3"
+            />
+            <label class="form-check-label" for="soil3">Sand (817)</label>
+          </div>
+          <a class="show-more d-block mt-2">Show more ▼</a>
+        </div>
+        <div class="mb-4">
+          <h6>Usages</h6>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Ornamental"
+              id="usage1"
+            />
+            <label class="form-check-label" for="usage1"
+              >Ornamental (3,296)</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Medicinal"
+              id="usage2"
+            />
+            <label class="form-check-label" for="usage2">Medicinal (638)</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="Edible"
+              id="usage3"
+            />
+            <label class="form-check-label" for="usage3">Edible (817)</label>
+          </div>
+          <a class="show-more d-block mt-2">Show more ▼</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 JS and Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const plants = [
+        {
+          plantId: "P001",
+          scientificName: "Rosa chinensis",
+          commonName: "Chinese Rose",
+          description: "A beautiful flowering shrub.",
+          family: "Rosaceae",
+          addedDate: "19 July, 2025",
+          plantType: "Shrub",
+          climate: "Temperate",
+          status: "Active",
+        },
+        {
+          plantId: "P002",
+          scientificName: "Helianthus annuus",
+          commonName: "Sunflower",
+          description: "Tall annual plant with large flowers.",
+          family: "Asteraceae",
+          addedDate: "18 July, 2025",
+          plantType: "Herb",
+          climate: "Temperate",
+          status: "Active",
+        },
+        {
+          plantId: "P003",
+          scientificName: "Ficus carica",
+          commonName: "Fig Tree",
+          description: "Fruit-bearing tree.",
+          family: "Moraceae",
+          addedDate: "17 July, 2025",
+          plantType: "Tree",
+          climate: "Mediterranean",
+          status: "Deactive",
+        },
+        {
+          plantId: "P004",
+          scientificName: "Lavandula angustifolia",
+          commonName: "Lavender",
+          description: "Aromatic perennial herb.",
+          family: "Lamiaceae",
+          addedDate: "20 July, 2025",
+          plantType: "Herb",
+          climate: "Mediterranean",
+          status: "Active",
+        },
+        {
+          plantId: "P005",
+          scientificName: "Aloe vera",
+          commonName: "Aloe Vera",
+          description: "Succulent plant with medicinal properties.",
+          family: "Asphodelaceae",
+          addedDate: "16 July, 2025",
+          plantType: "Succulent",
+          climate: "Arid",
+          status: "Active",
+        },
+      ];
+
+      function renderTable(data) {
+        const tbody = document.getElementById("plantTable");
+        tbody.innerHTML = "";
+
+        data.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td><input type="checkbox" class="form-check-input"></td>
+                    <td><img src="https://via.placeholder.com/40" class="me-2 rounded" alt="plant">${
+                      item.commonName
+                    } (${item.scientificName})</td>
+                    <td>${item.family}</td>
+                    <td>${item.addedDate}</td>
+                    <td>${item.plantType}</td>
+                    <td>${item.climate}</td>
+                    <td><span class="badge rounded-pill ${
+                      item.status === "Active"
+                        ? "bg-success"
+                        : "bg-danger text-white"
+                    }">${item.status}</span></td>
+                    <td>
+                        <a href="#" class="text-secondary me-2"><i class="bi bi-eye"></i></a>
+                        <a href="#" class="text-secondary me-2"><i class="bi bi-pencil"></i></a>
+                        <a href="#" class="text-secondary"><i class="bi bi-trash"></i></a>
+                    </td>
+                `;
+          tbody.appendChild(row);
+        });
+      }
+
+      function filterPlants() {
+        const search = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        // Add logic for offcanvas filters here (e.g., get checked values and filter plants array accordingly)
+        // For prototype, just search for now
+
+        let filteredPlants = plants;
+
+        if (search) {
+          filteredPlants = filteredPlants.filter(
+            (plant) =>
+              plant.commonName.toLowerCase().includes(search) ||
+              plant.scientificName.toLowerCase().includes(search) ||
+              plant.description.toLowerCase().includes(search)
+          );
+        }
+
+        renderTable(filteredPlants);
+      }
+
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", filterPlants);
+      // Add event listeners for offcanvas checkboxes if needed for dynamic filtering
+
+      // Initial render
+      renderTable(plants);
+    </script>
+  </body>
+</html>
