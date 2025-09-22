@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo Thêm/Sửa Cây Trồng Đủ Field</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.10.4/dist/css/tempus-dominus.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.10.4/dist/js/tempus-dominus.min.js"></script>
+    <style>
+        body { background: #f8f9fa; }
+        .container { max-width: 900px; margin-top: 40px; background: #fff; border-radius: 14px; box-shadow: 0 6px 28px #0001; padding: 35px 30px; }
+        .form-label { font-weight: 500; }
+        .table th, .table td { vertical-align: middle; }
+        .img-thumb { max-width: 80px; max-height: 70px; border-radius: 6px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 id="form-title" class="mb-4">Thêm cây mới</h2>
+    <form id="plant-form" enctype="multipart/form-data">
+        <input type="hidden" id="plantId">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Tên khoa học</label>
+                <input type="text" class="form-control" id="scientificName" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Tên thường gọi</label>
+                <input type="text" class="form-control" id="commonName" required>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mô tả</label>
+            <textarea class="form-control" id="description" rows="2" required></textarea>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Loại cây</label>
+                <select class="form-select" id="plantType" required>
+                    <option value="">-- Chọn loại cây --</option>
+                    <option value="1">Cây lương thực</option>
+                    <option value="2">Cây cảnh</option>
+                    <option value="3">Cây ăn quả</option>
+                    <option value="4">Cây dược liệu</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Thời gian thu hoạch (tháng)</label>
+                <input type="number" class="form-control" id="harvestTime" min="1" max="60">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Ngày thêm</label>
+                <div class="input-group" id="datetimepicker-create">
+                    <input type="text" class="form-control" id="createTime" autocomplete="off"/>
+                    <span class="input-group-text">&#128197;</span>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Vùng miền</label>
+            <div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="region1" value="Miền Bắc">
+                    <label class="form-check-label" for="region1">Miền Bắc</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="region2" value="Miền Trung">
+                    <label class="form-check-label" for="region2">Miền Trung</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="region3" value="Miền Nam">
+                    <label class="form-check-label" for="region3">Miền Nam</label>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Loại đất</label>
+            <div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="soil1" value="Đất phù sa">
+                    <label class="form-check-label" for="soil1">Đất phù sa</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="soil2" value="Đất đỏ bazan">
+                    <label class="form-check-label" for="soil2">Đất đỏ bazan</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="soil3" value="Đất cát">
+                    <label class="form-check-label" for="soil3">Đất cát</label>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Khí hậu</label>
+            <div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="climate1" value="Nhiệt đới">
+                    <label class="form-check-label" for="climate1">Nhiệt đới</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="climate2" value="Ôn đới">
+                    <label class="form-check-label" for="climate2">Ôn đới</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="climate3" value="Cận nhiệt đới">
+                    <label class="form-check-label" for="climate3">Cận nhiệt đới</label>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mục đích sử dụng</label>
+            <div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="usage1" value="Ăn uống">
+                    <label class="form-check-label" for="usage1">Ăn uống</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="usage2" value="Làm cảnh">
+                    <label class="form-check-label" for="usage2">Làm cảnh</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="usage3" value="Lấy gỗ">
+                    <label class="form-check-label" for="usage3">Lấy gỗ</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="usage4" value="Làm thuốc">
+                    <label class="form-check-label" for="usage4">Làm thuốc</label>
+                </div>
+            </div>
+        </div>
+        <div class="mb-4">
+            <label class="form-label">Hình ảnh</label>
+            <input class="form-control" type="file" id="image" accept="image/*">
+            <img id="imgPreview" class="img-thumb mt-2" style="display:none"/>
+        </div>
+        <div class="d-flex gap-2 mb-4">
+            <button type="submit" class="btn btn-success" id="submit-btn">Thêm mới</button>
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">Hủy</button>
+        </div>
+    </form>
+    <hr>
+    <h5>Danh sách cây đã nhập</h5>
+    <div class="table-responsive">
+        <table class="table table-bordered mt-3">
+            <thead class="table-light">
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Tên thường gọi</th>
+                    <th>Khoa học</th>
+                    <th>Loại cây</th>
+                    <th>Vùng</th>
+                    <th>Khí hậu</th>
+                    <th>Đất</th>
+                    <th>Thu hoạch</th>
+                    <th>Sử dụng</th>
+                    <th>Ngày</th>
+                    <th>Mô tả</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="plant-list"></tbody>
+        </table>
+    </div>
+</div>
+<script>
+    // Optional safety: Wait for DOM and libraries to load
+    document.addEventListener('DOMContentLoaded', function() {
+        let plants = [];
+        function renderPlants() {
+            const tb = document.getElementById('plant-list');
+            tb.innerHTML = plants.length === 0 ? 
+                `<tr><td colspan="12"><em>Chưa có dữ liệu</em></td></tr>` :
+                plants.map((p, i) => `
+                    <tr>
+                        <td>
+                            ${p.imageUrl ? `<img src="${p.imageUrl}" class="img-thumb"/>` : ""}
+                        </td>
+                        <td>${p.commonName}</td>
+                        <td>${p.scientificName}</td>
+                        <td>${getPlantTypeText(p.plantType)}</td>
+                        <td>${(p.regions||[]).join(', ')}</td>
+                        <td>${(p.climates||[]).join(', ')}</td>
+                        <td>${(p.soilTypes||[]).join(', ')}</td>
+                        <td>${p.harvestTime || ''}</td>
+                        <td>${(p.usages||[]).join(', ')}</td>
+                        <td>${p.createTime || ''}</td>
+                        <td>${p.description}</td>
+                        <td>
+                            <button class="btn btn-link p-0" onclick="editPlant(${i})">Sửa</button>
+                        </td>
+                    </tr>
+                `).join('');
+        }
+
+        function getCheckedValues(nameArr) {
+            return nameArr.filter(id => document.getElementById(id).checked)
+                          .map(id => document.getElementById(id).value);
+        }
+        function getPlantTypeText(type) {
+            switch(type) {
+                case "1": return "Cây lương thực";
+                case "2": return "Cây cảnh";
+                case "3": return "Cây ăn quả";
+                case "4": return "Cây dược liệu";
+                default: return "-";
+            }
+        }
+        // Khởi tạo datepicker Tempus Dominus
+        const createTimePicker = new tempusDominus.TempusDominus(document.getElementById('datetimepicker-create'), {
+            display: {
+                components: { decades: false, year: true, month: true, date: true, hours: false, minutes: false, seconds: false }
+            },
+            localization: {
+                locale: 'vi'
+            }
+        });
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = this.files[0];
+            if (!file) {
+                document.getElementById('imgPreview').style.display = 'none';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                document.getElementById('imgPreview').src = evt.target.result;
+                document.getElementById('imgPreview').style.display = '';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('plant-form').onsubmit = function(e) {
+            e.preventDefault();
+            // Lấy ngày từ Tempus Dominus
+            const dateVal = createTimePicker.dates.picked[0];
+            const createTime = dateVal ? dateVal.toISOString().split('T')[0] : '';
+            // Get data các field khác
+            const plantId = document.getElementById('plantId').value;
+            const scientificName = document.getElementById('scientificName').value;
+            const commonName = document.getElementById('commonName').value;
+            const description = document.getElementById('description').value;
+            const plantType = document.getElementById('plantType').value;
+            const harvestTime = document.getElementById('harvestTime').value;
+            const regions = getCheckedValues(['region1','region2','region3']);
+            const soilTypes = getCheckedValues(['soil1','soil2','soil3']);
+            const climates = getCheckedValues(['climate1','climate2','climate3']);
+            const usages = getCheckedValues(['usage1','usage2','usage3','usage4']);
+
+            let imageUrl = document.getElementById('imgPreview').src;
+            if (imageUrl.indexOf('data:image') === -1) imageUrl = '';
+
+            if (plantId) {
+                // update
+                let idx = plants.findIndex(x => x.plantId === plantId);
+                if (idx > -1) {
+                    plants[idx] = { plantId, scientificName, commonName, description, plantType, harvestTime, createTime, regions, soilTypes, climates, usages, imageUrl };
+                }
+            } else {
+                // add
+                plants.push({ 
+                    plantId: 'p' + Date.now(),
+                    scientificName, commonName, description, plantType, harvestTime, createTime, regions, soilTypes, climates, usages, imageUrl 
+                });
+            }
+            resetForm();
+            renderPlants();
+        };
+
+        function editPlant(idx) {
+            const p = plants[idx];
+            document.getElementById('plantId').value = p.plantId;
+            document.getElementById('scientificName').value = p.scientificName;
+            document.getElementById('commonName').value = p.commonName;
+            document.getElementById('description').value = p.description;
+            document.getElementById('plantType').value = p.plantType;
+            document.getElementById('harvestTime').value = p.harvestTime;
+
+            // reset checkbox
+            ['region1','region2','region3','soil1','soil2','soil3','climate1','climate2','climate3','usage1','usage2','usage3','usage4'].forEach(id => {
+                document.getElementById(id).checked = false;
+            });
+            (p.regions||[]).forEach(val => {
+                let id = ['region1','region2','region3'].find(i => document.getElementById(i).value == val);
+                if (id) document.getElementById(id).checked = true;
+            });
+            (p.soilTypes||[]).forEach(val => {
+                let id = ['soil1','soil2','soil3'].find(i => document.getElementById(i).value == val);
+                if (id) document.getElementById(id).checked = true;
+            });
+            (p.climates||[]).forEach(val => {
+                let id = ['climate1','climate2','climate3'].find(i => document.getElementById(i).value == val);
+                if (id) document.getElementById(id).checked = true;
+            });
+            (p.usages||[]).forEach(val => {
+                let id = ['usage1','usage2','usage3','usage4'].find(i => document.getElementById(i).value == val);
+                if (id) document.getElementById(id).checked = true;
+            });
+            if (p.imageUrl) {
+                document.getElementById('imgPreview').src = p.imageUrl;
+                document.getElementById('imgPreview').style.display = '';
+            } else {
+                document.getElementById('imgPreview').style.display = 'none';
+            }
+            // Set ngày cho Tempus Dominus
+            if (p.createTime) {
+                createTimePicker.dates.setValue(new Date(p.createTime));
+            } else {
+                createTimePicker.dates.clear();
+            }
+            document.getElementById('form-title').innerText = "Cập nhật cây trồng";
+            document.getElementById('submit-btn').innerText = "Cập nhật";
+        }
+        function resetForm() {
+            document.getElementById('plant-form').reset();
+            document.getElementById('plantId').value = '';
+            document.getElementById('imgPreview').style.display = 'none';
+            document.getElementById('form-title').innerText = "Thêm cây mới";
+            document.getElementById('submit-btn').innerText = "Thêm mới";
+            // reset checkboxes
+            ['region1','region2','region3','soil1','soil2','soil3','climate1','climate2','climate3','usage1','usage2','usage3','usage4'].forEach(id => {
+                document.getElementById(id).checked = false;
+            });
+            // Reset Tempus Dominus
+            createTimePicker.dates.clear();
+        }
+
+        // Lần đầu load
+        renderPlants();
+    });
+</script>
+</body>
+</html>
