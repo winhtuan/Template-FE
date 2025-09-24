@@ -73,3 +73,7 @@ public class PlantReportService
         return ms.ToArray();
     }
 }
+// dotnet add package MESCIUS.ActiveReports --version 19.1.1
+// dotnet add package MESCIUS.ActiveReports.Aspnetcore.Viewer --version 19.1.1
+// dotnet add package MESCIUS.ActiveReports.Export.Pdf --version 19.1.1
+
