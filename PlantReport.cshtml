@@ -1,0 +1,128 @@
+@page "/report"
+@model demo_mescius_report.Pages.PlantReportModel
+@{
+    ViewData["Title"] = "Tra cứu cây trồng";
+}
+
+<div class="chart-container mb-4">
+    <div class="options-bar mb-3 d-flex gap-2">
+        <!-- Category Dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="categoryDropdown" data-toggle="dropdown">
+                Theo danh mục
+            </button>
+            <div class="dropdown-menu" aria-labelledby="categoryDropdown">
+                <a class="dropdown-item category-option" href="#" data-category="category">Theo danh mục</a>
+                <a class="dropdown-item category-option" href="#" data-category="region">Theo vùng miền</a>
+            </div>
+        </div>
+        
+        <!-- Date Picker -->
+        <input type="text" id="datePicker" class="form-control" style="max-width: 180px;" placeholder="Select date" autocomplete="off" />
+
+        <!-- Export PDF Button -->
+        <form id="exportForm" method="post" asp-page-handler="ExportPdf">
+            <input type="hidden" name="type" id="exportTypeInput" />
+            <input type="hidden" name="date" id="exportDateInput" />
+            <button type="submit" class="btn btn-success">Xuất PDF</button>
+        </form>
+    </div>
+
+    <canvas id="barChart"></canvas>
+</div>
+
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>      
+let currentType = "category";
+let currentDate = null;
+
+// Setup DatePicker (only once!)
+$('#datePicker').daterangepicker({
+    singleDatePicker: true,
+    showDropdowns: true,
+    autoUpdateInput: false,
+    locale: { cancelLabel: 'Clear' }
+});
+
+$('#datePicker').on('apply.daterangepicker', function(ev, picker) {
+    let isoDate = picker.startDate.format('YYYY-MM-DD');
+    $(this).val(picker.startDate.format('DD/MM/YYYY'));
+    currentDate = isoDate;
+    loadChartData(currentType, currentDate);
+    updateExportInputs();
+});
+$('#datePicker').on('cancel.daterangepicker', function(ev, picker) {
+    $(this).val('');
+    currentDate = null;
+    loadChartData(currentType, null);
+    updateExportInputs();
+});
+
+const colors = [
+    'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)',
+    'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)',
+    'rgba(199, 199, 199, 0.7)', 'rgba(83, 102, 255, 0.7)', 'rgba(255, 99, 255, 0.7)'
+];
+const borderColors = colors.map(c => c.replace('0.7', '1'));
+
+const ctx = document.getElementById('barChart').getContext('2d');
+const barChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Số lượng cây',
+            data: [],
+            backgroundColor: [],
+            borderColor: [],
+            borderWidth: 1
+        }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+});
+
+// Update hidden export inputs
+function updateExportInputs() {
+    document.getElementById('exportTypeInput').value = currentType;
+    document.getElementById('exportDateInput').value = currentDate || "";
+}
+
+// Load dữ liệu chart với filter type + date
+async function loadChartData(type = currentType, date = currentDate) {
+    let url = `?handler=ChartData&type=${type}`;
+    if (date) url += `&date=${date}`;
+    const res = await fetch(url);
+    const json = await res.json();
+    barChart.data.labels = json.labels;
+    barChart.data.datasets[0].data = json.data;
+    barChart.data.datasets[0].backgroundColor = json.labels.map((_, i) => colors[i % colors.length]);
+    barChart.data.datasets[0].borderColor = json.labels.map((_, i) => borderColors[i % borderColors.length]);
+    barChart.update();
+}
+
+// Đổi loại filter
+$('.category-option').on('click', function(e) {
+    e.preventDefault();
+    currentType = $(this).data('category');
+    $('#categoryDropdown').text($(this).text());
+    loadChartData(currentType, currentDate);
+    updateExportInputs();
+});
+
+// Lần đầu load
+document.addEventListener('DOMContentLoaded', function() {
+    loadChartData(currentType, currentDate);
+    updateExportInputs();
+});
+
+    </script>
+}
